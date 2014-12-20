@@ -9,8 +9,25 @@ var rotTween = function(){
 
 var gameBoard = d3.select('body').append('svg');
 
+var counter = 0;
+var high = 0;
+
+
+var updateScore = function(){
+  d3.select('.current').select('span').text(counter);
+};
+
+var highScore = function(){
+  if(high <= counter){
+    high++;
+    d3.select('.high').select('span').text(counter);
+  }
+}
 
 var dragmove = function(d, i){
+  counter += 1;
+  updateScore();
+  highScore();
   var x = d3.event.x;
   var y = d3.event.y;
   d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
