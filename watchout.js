@@ -1,17 +1,9 @@
-var enemyNum = 5;
-
-var rotTween = function(){
-  var i = d3.interpolate(0, 360);
-  return function(t){
-    return "rotate(" + i(t) + ", 100, 100)";
-  };
-};
-
 var gameBoard = d3.select('body').append('svg');
-
 var counter = 0;
 var high = 0;
+var storedEnemy = [];
 
+d3.select('button').on('click', function(){location.reload();})
 
 var updateScore = function(){
   d3.select('.current').select('span').text(counter);
@@ -31,30 +23,57 @@ var dragmove = function(d, i){
   var x = d3.event.x;
   var y = d3.event.y;
   d3.select(this).attr("transform", "translate(" + x + "," + y + ")");
+  d3.selectAll('rect').data(storedEnemy).attr('x', function(item){
+    if(this.item === x){
+      console.log('collision');
+    }
+  }).attr('y', function(item){
+    if(this.item === y){
+      console.log('collision');
+    }
+  })
 }
 
 var drag = d3.behavior.drag().on('drag', dragmove);
 
 
 var user = gameBoard.append('circle')
-.attr('cx', 25)
-.attr('cy', 25)
-.attr('r', 25)
-.style('fill', 'blue')
+.attr('cx', 15)
+.attr('cy', 15)
+.attr('r', 15)
+.style('fill', 'white')
 .call(drag);
 
 
 
-var enemy = function(){
-  for(var i = 0; i < enemyNum; i++){
+var enemy = function(xTime, yTime){
+var enemyNum = 20;
+  var innerFunc = function(xTime, yTime){
+    if(enemyNum === 0){
+      return;
+    }
     gameBoard.append('rect', function(d){return d;})
-    .attr("x",Math.floor(Math.random() * 500))
-    .attr("y",Math.floor(Math.random() * 300))
-    .attr("width",50)
-    .attr("height",50)
-    .style("fill","orange");
+    .attr("x", xTime)
+    .attr("y", yTime)
+    .attr("width",20)
+    .attr("height",20)
+    .style("fill","green");
+    enemyNum--;
+    storedEnemy.push(1);
+    innerFunc(Math.floor(Math.random()*400), Math.floor(Math.random()*400));
   }
+  innerFunc(Math.floor(Math.random()*400), Math.floor(Math.random()*400))
 };
 enemy();
 
-d3.select('button').on('click', function(){location.reload();})
+var moveEnemies = function(){
+  gameBoard.selectAll('rect')
+  .transition()
+  .duration(3000)
+  .attr('x', function(d){ return Math.floor(Math.random() * 700)})
+  .attr('y', function(d){ return Math.floor(Math.random() * 700)})
+  .style('fill', function(d){ return 'green'})
+}
+moveEnemies();
+setInterval(moveEnemies, 4000);
+
